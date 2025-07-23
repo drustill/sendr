@@ -18,8 +18,8 @@ class KQueueListener
     KQueueListener();
     ~KQueueListener();
 
-    void Start() override;
-    void Stop() override;
-    void AddListener(Listener listener) override;
-    void WatchDir(const std::string& path) override;
-}
+    void Start();
+    void Stop();
+    void AddListener(Listener listener);
+    void WatchDir(const std::string& path);
+};
