@@ -3,6 +3,9 @@
 #include <iostream>
 #include <sys/event.h>
 
+KQueueListener::KQueueListener() {}
+KQueueListener::~KQueueListener() {}
+
 void KQueueListener::EventLoop()
 {
   int kq = kqueue();
