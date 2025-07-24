@@ -1,7 +1,6 @@
 #include "DotEnv.h"
 #include "Utils.h"
 
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
 

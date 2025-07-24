@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+#include <string>
+#include <cstdlib>
+
 namespace util
 {
   inline std::vector<std::string> split(const std::string& s, const std::string& delimiter)
