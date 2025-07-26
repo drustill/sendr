@@ -7,6 +7,8 @@
 
 namespace
 {
+  // Note that NOTE_WRITE will be the fflag
+  // for file creates on a watched directory
   FileAction actionFromFFlags(unsigned long fflags)
   {
     if (fflags & NOTE_DELETE)

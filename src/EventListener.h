@@ -15,6 +15,12 @@ struct FileEvent {
     std::string    oldPath{};
 };
 
+/**
+ * @brief Abstract Base Class for event listeners
+ *
+ * Implementing classes can be registered as listeners
+ * to a KQueueListener
+ */
 class EventListener {
 public:
     virtual void OnEvent(const FileEvent& e) = 0;
