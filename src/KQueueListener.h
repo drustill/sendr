@@ -1,3 +1,11 @@
+/// @brief kqueue file-system watcher
+///
+/// Opens directories, registers them with kqueue
+/// and exposes an event loop to deliver events on
+/// a single background thread
+///
+/// @see man 2 kqueue
+/// @see man 2 kevent
 #pragma once
 
 #include <atomic>
@@ -5,16 +13,6 @@
 
 #include "Using.h"
 
-/**
- * @brief kqueue file-system watcher
- *
- * Opens directories, registers them with kqueue
- * and exposes an event loop to deliver events on
- * a single background thread
- *
- * @see man 2 kqueue
- * @see man 2 kevent
- */
 class KQueueListener
 {
   private:
@@ -22,57 +20,42 @@ class KQueueListener
     std::thread evloop;
     std::atomic<bool> running;
 
+
     WatchMap watched;
     Listeners listeners;
 
-    /**
-     * @brief Block in kevent() and emit to registered listeners.
-     */
+
+    /// Block in kevent() and emit to registered listeners.
     void EventLoop();
 
   public:
-    /**
-     * @brief Create kqueue descriptor
-     *
-     * @note No directory is watched until WatchDir is called.
-     */
+    /// Create kqueue descriptor.
+    /// @note No directory is watched until WatchDir is called.
     KQueueListener();
 
 
-    /**
-     * @brief Calls Stop and closes all file descriptors.
-     */
+    /// Stop event loop and close all file descriptors.
     ~KQueueListener();
 
 
-    /**
-     * @brief Start the event loop on a thread.
-     */
+    /// Start the event loop on a background thread.
     void Start();
 
 
-    /**
-     * @brief Join the event loop thread
-     */
+    /// Join the event loop thread and stop processing events.
     void Stop();
 
 
-    /**
-     * @brief Register a listener to receive event notifications.
-     */
+    /// Register a listener to receive event notifications.
     void AddListener(EventListener* l);
 
 
-    /**
-     * @brief Begin watching a directory for changes.
-     *
-     * Get an event notification descriptor through open(O_EVTONLY)
-     * and populates the kevent with EV_SET.
-     *
-     * EV_CLEAR resets the kevent automatically
-     *
-     * @see man 2 open    O_EVTONLY
-     * @see man 2 kevent  EV_SET, EVFILT_VNODE, NOTE flags
-     */
+    /// Begin watching a directory for changes.
+    ///
+    /// Opens the directory with O_EVTONLY and registers it
+    /// using EV_SET with EVFILT_VNODE and NOTE_* flags.
+    /// EV_CLEAR ensures edge-triggered behavior.
+    /// @see man 2 open    (O_EVTONLY)
+    /// @see man 2 kevent  (EV_SET, EVFILT_VNODE, NOTE flags)
     int WatchDir(const std::string& path);
 };
