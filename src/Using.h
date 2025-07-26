@@ -2,9 +2,12 @@
 
 #include "EventListener.h"
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
-using Listener = std::unique_ptr<EventListener>;
-using Listeners = std::vector<Listener>;
+using Listeners = std::vector<EventListener*>;
+
+using KEvent = struct kevent;
+using WatchMap = std::map<int, std::string>;

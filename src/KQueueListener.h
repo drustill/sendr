@@ -1,25 +1,29 @@
 #pragma once
 
 #include <atomic>
-#include <set>
+#include <thread>
 
 #include "Using.h"
 
 class KQueueListener
 {
   private:
-    void EventLoop();
     int kqfd, dirfd;
 
     std::atomic<bool> running;
+    std::thread evloop;
+
     Listeners listeners;
-    std::set<std::string> seen;
+    WatchMap watched;
+
+    void EventLoop();
+
   public:
     KQueueListener();
     ~KQueueListener();
 
     void Start();
     void Stop();
-    void AddListener(Listener listener);
-    void WatchDir(const std::string& path);
+    void AddListener(EventListener* l);
+    int WatchDir(const std::string& path);
 };
