@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB SRC_FILES
   src/*.cpp
 )
-list(FILTER SRC_FILES EXCLUDE REGEX ".*TestUtils\\.cpp$")
+list(FILTER SRC_FILES EXCLUDE REGEX ".*Test.*\\.cpp$")
 
 add_executable(mailfs
   ${SRC_FILES}
@@ -38,5 +38,25 @@ if (BUILD_TESTS)
 
   include(CTest)
   enable_testing()
+
   add_test(NAME test_utils COMMAND test_utils)
+
+  add_executable(test_htmlparser
+    src/HtmlParser.cpp
+    src/TestHtmlParser.cpp
+  )
+
+  target_include_directories(test_htmlparser
+    PRIVATE
+      ${CMAKE_SOURCE_DIR}/src
+  )
+
+  target_link_libraries(test_htmlparser
+    PRIVATE
+      Catch2::Catch2WithMain
+  )
+
+  add_test(NAME test_htmlparser COMMAND test_htmlparser)
+
+
 endif()
