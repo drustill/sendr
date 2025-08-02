@@ -3,6 +3,7 @@
 #include "Using.h"
 
 #include <gumbo.h>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -51,7 +52,8 @@ public:
   ///
   /// Walks the tree recursively using a lambda, each
   /// <tr> becomes one Row in the output
-  RowVector Parse(const std::string &html) const;
+  RowVector Parse(const std::string &html,
+                  std::optional<int> max_results = std::nullopt) const;
 };
 
 /// RAII wrapper for Gumbo parser

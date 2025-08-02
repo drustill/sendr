@@ -27,9 +27,5 @@ RowVector SearchClient::Search(const SearchParams &params) const {
     throw std::runtime_error("Search failed : " +
                              std::to_string(response.status_code));
   }
-  auto rows = reader.Parse(response.body);
-  if (params.max_results > 0 && rows.size() > params.max_results) {
-    rows.resize(params.max_results);
-  }
-  return rows;
+  return reader.Parse(response.body, params.max_results);
 }

@@ -1,13 +1,18 @@
 #include "RowReader.h"
 #include "Utils.h"
 
-RowVector RowReader::Parse(const std::string &html) const {
+RowVector RowReader::Parse(const std::string &html,
+                           std::optional<int> max_results) const {
   GumboOutputWrapper doc(html);
   RowVector rows;
+
+  bool done = false;
 
   static const std::regex md5_re(R"(^/md5/([0-9a-fA-F]{32}))");
 
   std::function<void(GumboNode *)> walk = [&](GumboNode *node) {
+    if (done)
+      return;
     if (node->type != GUMBO_NODE_ELEMENT)
       return;
 
@@ -33,6 +38,9 @@ RowVector RowReader::Parse(const std::string &html) const {
       }
 
       rows.push_back(std::move(row));
+      if (max_results && *max_results == rows.size())
+        done = true;
+      return;
     }
 
     GumboVector *children = &node->v.element.children;
