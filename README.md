@@ -1,6 +1,6 @@
-# mailfs
+# sendr
 
-FileSystem over E-Mail (particularly for Kindle)
+Search for books, download them, and automatically have them emailed to an ereader directly from the command line
 
 ---
 
@@ -38,11 +38,12 @@ Build presets are in `CMakePresets.json`, and will build the program with or wit
 ## Stage of development
 
 - [x] kqueue events emitted to registered listeners.
-- [x] mailfs cli
+- [x] ./sendr 'query' and see list of results
+- [ ] sendr cli
 
-- `mailfs` cli design
+- `sendr` cli design
   ```bash
-    Usage: mailfs fetch [--engine <name>] [--max N] [--format epub|pdf] <search terms…>
+    Usage: sendr fetch [--engine <name>] [--max N] [--format epub|pdf] <search terms…>
 
     Options:
       --engine <name>     which indexer to query (anna, libgen, openlib, gutenberg)
@@ -51,5 +52,5 @@ Build presets are in `CMakePresets.json`, and will build the program with or wit
       --dry-run           just print URLs, don’t download or send
       --out-dir <path>    download into this directory instead of mailing
       --send-to-kindle    after download, email to your Kindle address
-      --config <file>     path to ~/.mailfs/config (SMTP/IMAP creds, Kindle email)
+      --config <file>     path to ~/.sendr/config (SMTP/IMAP creds, Kindle email)
   ```

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(mailfs)
+project(sendr)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -8,11 +8,11 @@ file(GLOB SRC_FILES
 )
 list(FILTER SRC_FILES EXCLUDE REGEX ".*Test.*\\.cpp$")
 
-add_executable(mailfs
+add_executable(sendr
   ${SRC_FILES}
 )
 
-target_include_directories(mailfs
+target_include_directories(sendr
   PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
@@ -20,12 +20,12 @@ target_include_directories(mailfs
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GUMBO REQUIRED gumbo)
 
-target_include_directories(mailfs PRIVATE ${GUMBO_INCLUDE_DIRS})
-target_link_libraries(mailfs PRIVATE ${GUMBO_LIBRARIES} ${GUMBO_LDFLAGS})
-target_compile_options(mailfs PRIVATE ${GUMBO_CFLAGS_OTHER})
+target_include_directories(sendr PRIVATE ${GUMBO_INCLUDE_DIRS})
+target_link_libraries(sendr PRIVATE ${GUMBO_LIBRARIES} ${GUMBO_LDFLAGS})
+target_compile_options(sendr PRIVATE ${GUMBO_CFLAGS_OTHER})
 
 find_package(CURL REQUIRED)
-target_link_libraries(mailfs PRIVATE CURL::libcurl)
+target_link_libraries(sendr PRIVATE CURL::libcurl)
 
 option(BUILD_TESTS "Build Catch2 tests" OFF)
 
