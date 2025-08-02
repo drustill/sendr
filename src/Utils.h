@@ -1,8 +1,10 @@
 #pragma once
 
+#include <gumbo.h>
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <regex>
 
 namespace util
 {
@@ -28,6 +30,55 @@ namespace util
   inline void ltrim(std::string &s)
   {
     s.erase(s.find_first_not_of(" \n\r\t"));
+  }
+
+  inline bool has_class(GumboNode* node, const char* cls_name) {
+    if (node->type != GUMBO_NODE_ELEMENT)
+      return false;
+    GumboAttribute* cls_attr = gumbo_get_attribute(&node->v.element.attributes, "class");
+    return cls_attr && strstr(cls_attr->value, cls_name) != nullptr;
+  }
+
+  inline std::string cleantext(GumboNode* node) {
+    if (node->type == GUMBO_NODE_TEXT) {
+      return std::string(node->v.text.text);
+    } else if (node->type == GUMBO_NODE_ELEMENT && node->v.element.tag != GUMBO_TAG_SCRIPT && node->v.element.tag != GUMBO_TAG_STYLE) {
+      std::string contents = "";
+      GumboVector* children = &node->v.element.children;
+      for (unsigned int i = 0; i < children->length; ++i) {
+        const std::string text = cleantext(static_cast<GumboNode*>(children->data[i]));
+        if (i != 0 && !text.empty()) {
+          contents.append(" ");
+        }
+        contents.append(text);
+      }
+      return contents;
+    } else {
+      return "";
+    }
+  }
+
+  inline std::string search_for_links(GumboNode* node, std::regex filter) {
+    if (node->type != GUMBO_NODE_ELEMENT)
+      return "";
+
+    GumboAttribute* href;
+    if (node->v.element.tag == GUMBO_TAG_A &&
+        (href = gumbo_get_attribute(&node->v.element.attributes, "href"))) {
+      std::smatch m;
+      std::string val = href->value;
+      if (std::regex_search(val, m, filter))
+        return m.str(1);
+    }
+
+    GumboVector* children = &node->v.element.children;
+    for (unsigned int i = 0; i < children->length; ++i) {
+      std::string link = search_for_links(static_cast<GumboNode*>(children->data[i]), filter);
+      if (!link.empty())
+        return link;
+    }
+
+    return "";
   }
 
 }
