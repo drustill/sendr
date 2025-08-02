@@ -1,3 +1,4 @@
+#include "HttpClient.h"
 #include "KQueueListener.h"
 #include "LoggingListener.h"
 #include "RowReader.h"
@@ -7,22 +8,21 @@
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
-    std::cout << "Usage: main <html filename>.\n";
+    std::cout << "Usage: main <url>.\n";
     exit(EXIT_FAILURE);
   }
-  const char *filename = argv[1];
-  std::ifstream in(filename, std::ios::in | std::ios::binary);
-  if (!in) {
-    std::cout << "File " << filename << " not found!\n";
-    exit(EXIT_FAILURE);
-  }
+  const std::string url = argv[1];
+  HttpClient client;
+  HttpResponse response = client.Get(url);
 
-  std::ostringstream buffer;
-  buffer << in.rdbuf();
-  std::string html = buffer.str();
+  if (response.status_code != 200) {
+    std::cout << "URL " << url << " bad request!\n";
+    std::cout << "Err " << response.status_code << "\n";
+    exit(EXIT_FAILURE);
+  }
 
   RowReader reader;
-  RowVector rows = reader.Parse(html);
+  RowVector rows = reader.Parse(response.body);
 
   for (const auto &row : rows) {
     std::cout << "MD5: " << row.md5 << "\n";

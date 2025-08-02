@@ -24,6 +24,8 @@ target_include_directories(mailfs PRIVATE ${GUMBO_INCLUDE_DIRS})
 target_link_libraries(mailfs PRIVATE ${GUMBO_LIBRARIES} ${GUMBO_LDFLAGS})
 target_compile_options(mailfs PRIVATE ${GUMBO_CFLAGS_OTHER})
 
+find_package(CURL REQUIRED)
+target_link_libraries(mailfs PRIVATE CURL::libcurl)
 
 option(BUILD_TESTS "Build Catch2 tests" OFF)
 
