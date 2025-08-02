@@ -5,12 +5,12 @@
 #include <fstream>
 #include <iostream>
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   if (argc < 2) {
     std::cout << "Usage: main <html filename>.\n";
     exit(EXIT_FAILURE);
   }
-  const char* filename = argv[1];
+  const char *filename = argv[1];
   std::ifstream in(filename, std::ios::in | std::ios::binary);
   if (!in) {
     std::cout << "File " << filename << " not found!\n";
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
   RowReader reader;
   RowVector rows = reader.Parse(html);
 
-  for (const auto& row : rows) {
+  for (const auto &row : rows) {
     std::cout << "MD5: " << row.md5 << "\n";
     std::cout << "Title: " << row.title << "\n";
     std::cout << "Author: " << row.author << "\n";

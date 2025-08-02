@@ -3,14 +3,13 @@
 #include <string>
 #include <vector>
 
-class DotEnv
-{
-  public:
-    DotEnv();
-    ~DotEnv();
+class DotEnv {
+public:
+  DotEnv();
+  ~DotEnv();
 
-    void LoadDotEnv();
+  void LoadDotEnv();
 
-  private:
-    std::string path = ".env";
+private:
+  std::string path = ".env";
 };

@@ -7,11 +7,10 @@
 #include <cstdint>
 #include <fstream>
 
-TEST_CASE("split succeeds with format key=value", "[Utils]")
-{
+TEST_CASE("split succeeds with format key=value", "[Utils]") {
   auto tokens = util::split("EnvironmentKey=EnvironmentValue", "=");
-  const auto& key = tokens[0];
-  const auto& value = tokens[1];
+  const auto &key = tokens[0];
+  const auto &value = tokens[1];
   CHECK(key == "EnvironmentKey");
   CHECK(value == "EnvironmentValue");
 }

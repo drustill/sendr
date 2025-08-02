@@ -23,7 +23,6 @@ struct Row {
   std::string md5, title, author, publisher, year, lang, format, size;
 };
 
-
 /// Parses Annas Archive search result html doc into a RowVector.
 ///
 /// Usage:
@@ -32,31 +31,28 @@ struct Row {
 ///
 /// Extracts data from each <tr> using Gumbo and makes a Row
 class RowReader {
-  private:
-    /// Maps <td> index to Row member
-    struct FieldMap {
-      size_t index;
-      std::string Row::*member;
-    };
-    static constexpr size_t FIELDS = 7;
-    static constexpr std::array<FieldMap, FIELDS> field_map {{
-      { 1, &Row::title},
-      { 2, &Row::author},
-      { 3, &Row::publisher},
-      { 4, &Row::year},
-      { 7, &Row::lang},
-      { 9, &Row::format},
-      { 10, &Row::size}
-    }};
+private:
+  /// Maps <td> index to Row member
+  struct FieldMap {
+    size_t index;
+    std::string Row::*member;
+  };
+  static constexpr size_t FIELDS = 7;
+  static constexpr std::array<FieldMap, FIELDS> field_map{{{1, &Row::title},
+                                                           {2, &Row::author},
+                                                           {3, &Row::publisher},
+                                                           {4, &Row::year},
+                                                           {7, &Row::lang},
+                                                           {9, &Row::format},
+                                                           {10, &Row::size}}};
 
-  public:
-    /// Uses Gumbo to parse html into a vector of Rows.
-    ///
-    /// Walks the tree recursively using a lambda, each
-    /// <tr> becomes one Row in the output
-    RowVector Parse(const std::string& html) const;
+public:
+  /// Uses Gumbo to parse html into a vector of Rows.
+  ///
+  /// Walks the tree recursively using a lambda, each
+  /// <tr> becomes one Row in the output
+  RowVector Parse(const std::string &html) const;
 };
-
 
 /// RAII wrapper for Gumbo parser
 ///
@@ -71,17 +67,15 @@ class RowReader {
 ///
 /// @see https://github.com/google/gumbo-parser/blob/master/src/gumbo.h
 class GumboOutputWrapper {
-  private:
-    GumboOutput* output;
+private:
+  GumboOutput *output;
 
-  public:
-    explicit GumboOutputWrapper(const std::string& html) :
-      output(gumbo_parse(html.c_str())) {}
+public:
+  explicit GumboOutputWrapper(const std::string &html)
+      : output(gumbo_parse(html.c_str())) {}
 
-    ~GumboOutputWrapper() {
-      gumbo_destroy_output(&kGumboDefaultOptions, output);
-    }
+  ~GumboOutputWrapper() { gumbo_destroy_output(&kGumboDefaultOptions, output); }
 
-    /// Convenience access to root
-    GumboNode* Root() const { return output->root; }
+  /// Convenience access to root
+  GumboNode *Root() const { return output->root; }
 };

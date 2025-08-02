@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-using Listeners = std::vector<EventListener*>;
+using Listeners = std::vector<EventListener *>;
 using KEvent = struct kevent;
 using WatchMap = std::map<int, std::string>;
 
