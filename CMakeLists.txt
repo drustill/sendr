@@ -17,6 +17,14 @@ target_include_directories(mailfs
     ${CMAKE_SOURCE_DIR}/src
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GUMBO REQUIRED gumbo)
+
+target_include_directories(mailfs PRIVATE ${GUMBO_INCLUDE_DIRS})
+target_link_libraries(mailfs PRIVATE ${GUMBO_LIBRARIES} ${GUMBO_LDFLAGS})
+target_compile_options(mailfs PRIVATE ${GUMBO_CFLAGS_OTHER})
+
+
 option(BUILD_TESTS "Build Catch2 tests" OFF)
 
 if (BUILD_TESTS)
@@ -40,23 +48,5 @@ if (BUILD_TESTS)
   enable_testing()
 
   add_test(NAME test_utils COMMAND test_utils)
-
-  add_executable(test_htmlparser
-    src/HtmlParser.cpp
-    src/TestHtmlParser.cpp
-  )
-
-  target_include_directories(test_htmlparser
-    PRIVATE
-      ${CMAKE_SOURCE_DIR}/src
-  )
-
-  target_link_libraries(test_htmlparser
-    PRIVATE
-      Catch2::Catch2WithMain
-  )
-
-  add_test(NAME test_htmlparser COMMAND test_htmlparser)
-
 
 endif()

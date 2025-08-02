@@ -19,4 +19,15 @@ namespace util
     tokens.emplace_back(s.substr(start));
     return tokens;
   }
+
+  inline void rtrim(std::string &s)
+  {
+    s.erase(s.find_last_not_of(" \n\r\t")+1);
+  }
+
+  inline void ltrim(std::string &s)
+  {
+    s.erase(s.find_first_not_of(" \n\r\t"));
+  }
+
 }

@@ -11,6 +11,5 @@ using Listeners = std::vector<EventListener*>;
 using KEvent = struct kevent;
 using WatchMap = std::map<int, std::string>;
 
-struct Node;
-
-using NodePtr = std::unique_ptr<Node>;
+struct Row;
+using RowVector = std::vector<Row>;
