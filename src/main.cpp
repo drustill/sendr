@@ -1,28 +1,24 @@
-#include "HttpClient.h"
 #include "KQueueListener.h"
 #include "LoggingListener.h"
-#include "RowReader.h"
+#include "SearchClient.h"
 
 #include <fstream>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
-    std::cout << "Usage: main <url>.\n";
-    exit(EXIT_FAILURE);
-  }
-  const std::string url = argv[1];
-  HttpClient client;
-  HttpResponse response = client.Get(url);
-
-  if (response.status_code != 200) {
-    std::cout << "URL " << url << " bad request!\n";
-    std::cout << "Err " << response.status_code << "\n";
+    std::cout << "Usage: main <query>.\n";
     exit(EXIT_FAILURE);
   }
 
-  RowReader reader;
-  RowVector rows = reader.Parse(response.body);
+  SearchClient client;
+  SearchParams params;
+
+  params.query = argv[1];
+  params.max_results = 5;
+  params.lang = "en";
+
+  RowVector rows = client.Search(params);
 
   for (const auto &row : rows) {
     std::cout << "MD5: " << row.md5 << "\n";

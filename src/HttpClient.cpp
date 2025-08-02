@@ -31,6 +31,9 @@ HttpResponse HttpClient::Request(const std::string &url) const {
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response.body);
 
+  // http -> https
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
   CURLcode res = curl_easy_perform(curl);
   if (res != CURLE_OK) {
     curl_easy_cleanup(curl);
