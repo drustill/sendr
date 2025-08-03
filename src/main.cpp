@@ -1,3 +1,4 @@
+#include "Cli.h"
 #include "KQueueListener.h"
 #include "LoggingListener.h"
 #include "SearchClient.h"
@@ -6,34 +7,39 @@
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    std::cout << "Usage: main <query>.\n";
-    exit(EXIT_FAILURE);
-  }
+  Cli cli;
+  return cli.Run(argc, argv);
+}
 
-  SearchClient client;
-  SearchParams params;
+// int main(int argc, char *argv[]) {
+//   if (argc < 2) {
+//     std::cout << "Usage: main <query>.\n";
+//     exit(EXIT_FAILURE);
+//   }
 
-  params.query = argv[1];
-  params.max_results = 5;
-  params.lang = "en";
+//   SearchClient client;
+//   SearchParams params;
 
-  RowVector rows = client.Search(params);
+//   params.query = argv[1];
+//   params.max_results = 5;
+//   params.lang = "en";
 
-  for (const auto &row : rows) {
-    std::cout << "MD5: " << row.md5 << "\n";
-    std::cout << "Title: " << row.title << "\n";
-    std::cout << "Author: " << row.author << "\n";
-    std::cout << "Publisher: " << row.publisher << "\n";
-    std::cout << "Year: " << row.year << "\n";
-    std::cout << "Lang: " << row.lang << "\n";
-    std::cout << "Format: " << row.format << "\n";
-    std::cout << "Size: " << row.size << "\n";
-    std::cout << "-------------------------\n";
-  }
+//   RowVector rows = client.Search(params);
 
-  return 0;
-};
+//   for (const auto &row : rows) {
+//     std::cout << "MD5: " << row.md5 << "\n";
+//     std::cout << "Title: " << row.title << "\n";
+//     std::cout << "Author: " << row.author << "\n";
+//     std::cout << "Publisher: " << row.publisher << "\n";
+//     std::cout << "Year: " << row.year << "\n";
+//     std::cout << "Lang: " << row.lang << "\n";
+//     std::cout << "Format: " << row.format << "\n";
+//     std::cout << "Size: " << row.size << "\n";
+//     std::cout << "-------------------------\n";
+//   }
+
+//   return 0;
+// };
 
 // int main()
 // {
