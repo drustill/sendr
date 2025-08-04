@@ -1,14 +1,18 @@
 #include "Cli.h"
+#include "Config.h"
 #include "KQueueListener.h"
 #include "LoggingListener.h"
+#include "MockDownloader.h"
 #include "SearchClient.h"
 
 #include <fstream>
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-  Cli cli;
-  return cli.Run(argc, argv);
+  MockDownloader downloader;
+  Config::WriteDefault();
+  // Cli cli(&downloader);
+  // return cli.Run(argc, argv);
 }
 
 // int main(int argc, char *argv[]) {

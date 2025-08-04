@@ -6,6 +6,8 @@
 #include <limits>
 #include <thread>
 
+Cli::Cli(DownloaderInterface *downloader) : downloader(downloader) {}
+
 int Cli::Run(int argc, char *argv[]) {
   if (argc < 2) {
     ShowUsage();
@@ -76,14 +78,12 @@ void Cli::DownloadAndSend(const Row &row) {
   std::cout << "Downloading " << row.title << "...\n";
 
   kq.AddListener(new LoggingListener());
+  std::string dir = std::string(std::getenv("HOME")) + "/KQueueListenerTest";
+  kq.WatchDir(dir);
   kq.Start();
 
-  std::string fakepath = "./downloads/" + row.md5 + ".epub";
-  std::this_thread::sleep_for(std::chrono::seconds(2));
+  downloader->Download(row.md5, dir + "/temp.txt");
 
-  std::cout << "Simulated file download at " << fakepath << "\n";
-  std::cout << "Sending to kindle...\n";
   kq.Stop();
   std::cout << "Sent!\n";
-  return;
 }

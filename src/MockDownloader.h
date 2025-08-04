@@ -3,7 +3,7 @@
 #include "DownloaderInterface.h"
 #include <fstream>
 
-class MockDownloader {
+class MockDownloader : public DownloaderInterface {
 public:
   std::string GetDownloadUrl(const std::string &md5) const override {
     return "https://example.com/" + md5;
@@ -15,4 +15,4 @@ public:
     out << "Mock data : " << md5 << "\n";
     out.close();
   }
-}
+};

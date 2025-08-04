@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DownloaderInterface.h"
 #include "KQueueListener.h"
 #include "SearchClient.h"
 
@@ -8,6 +9,7 @@
 
 class Cli {
 public:
+  Cli(DownloaderInterface *downloader);
   int Run(int argc, char *argv[]);
 
 private:
@@ -17,6 +19,7 @@ private:
   void StartInteractiveSession(RowVector &results);
   void DownloadAndSend(const Row &row);
 
-  SearchClient search;
   KQueueListener kq;
+  SearchClient search;
+  DownloaderInterface *downloader;
 };

@@ -3,7 +3,7 @@
 #include "DownloaderInterface.h"
 #include "HttpClient.h"
 
-class Downloader {
+class Downloader : public DownloaderInterface {
 public:
   explicit Downloader(std::string api_key);
   std::string GetDownloadUrl(const std::string &md5) const override;

@@ -72,7 +72,8 @@ void KQueueListener::Stop() {
 
   running = false;
   KEvent evSet;
-  EV_SET(&evSet, 0, EVFILT_USER, EV_ENABLE | EV_ADD, 0, 0, nullptr);
+  EV_SET(&evSet, 0, EVFILT_USER, EV_ENABLE | EV_ADD | EV_ONESHOT, NOTE_TRIGGER,
+         0, nullptr);
   kevent(kqfd, &evSet, 1, NULL, 0, NULL);
 
   if (evloop.joinable())

@@ -27,6 +27,12 @@ inline void rtrim(std::string &s) {
 
 inline void ltrim(std::string &s) { s.erase(s.find_first_not_of(" \n\r\t")); }
 
+inline void strip_comments(std::string &s) {
+  size_t comment = s.find("#");
+  if (comment != std::string::npos)
+    s = s.substr(0, comment);
+}
+
 inline bool has_class(GumboNode *node, const char *cls_name) {
   if (node->type != GUMBO_NODE_ELEMENT)
     return false;
