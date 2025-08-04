@@ -2,9 +2,11 @@
 
 #include "DownloaderInterface.h"
 #include <fstream>
+#include <string>
 
 class MockDownloader : public DownloaderInterface {
 public:
+  explicit MockDownloader(const Config &config);
   std::string GetDownloadUrl(const std::string &md5) const override {
     return "https://example.com/" + md5;
   }
@@ -15,4 +17,7 @@ public:
     out << "Mock data : " << md5 << "\n";
     out.close();
   }
+
+private:
+  std::string api_key;
 };

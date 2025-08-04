@@ -6,7 +6,8 @@
 #include <limits>
 #include <thread>
 
-Cli::Cli(DownloaderInterface *downloader) : downloader(downloader) {}
+Cli::Cli(DownloaderInterface *downloader, const Config &config)
+    : downloader(downloader), config(config) {}
 
 int Cli::Run(int argc, char *argv[]) {
   if (argc < 2) {

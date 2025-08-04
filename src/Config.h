@@ -4,17 +4,24 @@
 #include <string>
 #include <unordered_map>
 
+struct Settings {
+  std::string api_key;
+  std::string smtp_user;
+  std::string smtp_pass;
+  std::string kindle_email;
+  std::string download_dir;
+};
+
 class Config {
 public:
   static const std::string default_path;
 
   explicit Config(const std::string &path = default_path);
 
-  std::optional<std::string> Get(const std::string &key) const;
-  bool Has(const std::string &key) const;
+  const Settings &Get() const { return settings; }
 
   static void WriteDefault(const std::string &path = default_path);
 
 private:
-  std::unordered_map<std::string, std::string> values;
+  Settings settings;
 };

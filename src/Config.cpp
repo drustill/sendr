@@ -28,6 +28,7 @@ Config::Config(const std::string &path) {
     size_t eq = line.find('=');
     if (eq == std::string::npos)
       continue;
+
     std::string key = line.substr(0, eq);
     std::string val = line.substr(eq + 1);
 
@@ -36,18 +37,13 @@ Config::Config(const std::string &path) {
     util::rtrim(key);
     util::rtrim(val);
 
-    values[key] = val;
+    if (key == "annas_archive_key")
+      settings.api_key = val if (key == "smtp_user") settings.smtp_user =
+          val if (key == "smtp_pass") settings.smtp_pass =
+              val if (key == "kindle_email") settings.kindle_email =
+                  val if (key == "download_dir") settings.download_dir = val
   }
 }
-
-std::optional<std::string> Config::Get(const std::string &key) const {
-  auto it = values.find(key);
-  if (it == values.end())
-    return nullptr;
-  return it->second;
-}
-
-bool Config::Has(const std::string &key) const { return values.count(key) > 0; }
 
 void Config::WriteDefault(const std::string &path) {
   std::cout << path << "\n";

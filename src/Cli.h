@@ -9,7 +9,7 @@
 
 class Cli {
 public:
-  Cli(DownloaderInterface *downloader);
+  Cli(DownloaderInterface *downloader, const Config &config);
   int Run(int argc, char *argv[]);
 
 private:
@@ -22,4 +22,5 @@ private:
   KQueueListener kq;
   SearchClient search;
   DownloaderInterface *downloader;
+  const Config &config;
 };
