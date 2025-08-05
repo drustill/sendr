@@ -15,6 +15,7 @@ struct Settings {
 class Config {
 public:
   static const std::string default_path;
+  static const std::string default_download_dir;
 
   explicit Config(const std::string &path = default_path);
 

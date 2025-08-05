@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Config.h"
+
 #include <string>
 
 class DownloaderInterface {

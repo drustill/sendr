@@ -3,12 +3,16 @@
 
 #include <cstdlib>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
 const std::string Config::default_path =
     std::string(std::getenv("HOME")) + "/.config/sendr/sendr.conf";
+
+const std::string Config::default_download_dir =
+    std::string(std::getenv("HOME")) + "/sendr/lib/";
 
 Config::Config(const std::string &path) {
   std::ifstream f(path);
@@ -37,11 +41,17 @@ Config::Config(const std::string &path) {
     util::rtrim(key);
     util::rtrim(val);
 
-    if (key == "annas_archive_key")
-      settings.api_key = val if (key == "smtp_user") settings.smtp_user =
-          val if (key == "smtp_pass") settings.smtp_pass =
-              val if (key == "kindle_email") settings.kindle_email =
-                  val if (key == "download_dir") settings.download_dir = val
+    if (key == "annas_archive_key") {
+      settings.api_key = val;
+    } else if (key == "smtp_user") {
+      settings.smtp_user = val;
+    } else if (key == "smtp_pass") {
+      settings.smtp_pass = val;
+    } else if (key == "kindle_email") {
+      settings.kindle_email = val;
+    } else if (key == "download_dir") {
+      settings.download_dir = val;
+    }
   }
 }
 
@@ -49,6 +59,10 @@ void Config::WriteDefault(const std::string &path) {
   std::cout << path << "\n";
   std::filesystem::create_directories(
       std::filesystem::path(path).parent_path());
+
+  std::filesystem::create_directories(
+      std::filesystem::path(Config::default_download_dir).parent_path());
+
   std::ofstream out(path);
 
   if (!out.is_open()) {
@@ -56,7 +70,7 @@ void Config::WriteDefault(const std::string &path) {
     return;
   }
 
-  out << R"(# Configure sendr
+  out << std::format(R"(# Configure sendr
 
 # annas archive
 annas_archive_key =
@@ -69,8 +83,10 @@ smtp_pass =
 kindle_email =
 
 # library
-download_dir =
-)";
+download_dir = {}
+)",
+                     Config::default_download_dir);
+
   out.close();
   std::cout << "[INFO] Wrote default config to: " << path << "\n";
 }
