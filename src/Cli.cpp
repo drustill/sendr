@@ -79,12 +79,12 @@ void Cli::DownloadAndSend(const Row &row) {
   std::cout << "Downloading " << row.title << "...\n";
 
   kq.AddListener(new LoggingListener());
-  std::string dir = std::string(std::getenv("HOME")) + "/KQueueListenerTest";
+  std::string dir = config.Get().download_dir;
+
   kq.WatchDir(dir);
   kq.Start();
 
-  downloader->Download(row.md5, dir + "/temp.txt");
+  downloader->Download(row.md5, dir + "temp.txt");
 
   kq.Stop();
-  std::cout << "Sent!\n";
 }

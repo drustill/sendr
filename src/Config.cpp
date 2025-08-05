@@ -23,6 +23,8 @@ Config::Config(const std::string &path) {
 
   std::string line;
   while (std::getline(f, line)) {
+    if (line.empty())
+      continue;
     util::ltrim(line);
     util::rtrim(line);
     util::strip_comments(line);
@@ -34,7 +36,7 @@ Config::Config(const std::string &path) {
       continue;
 
     std::string key = line.substr(0, eq);
-    std::string val = line.substr(eq + 1);
+    std::string val = (eq + 1 < line.size()) ? line.substr(eq + 1) : "";
 
     util::ltrim(key);
     util::ltrim(val);

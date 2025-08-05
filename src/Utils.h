@@ -25,7 +25,14 @@ inline void rtrim(std::string &s) {
   s.erase(s.find_last_not_of(" \n\r\t") + 1);
 }
 
-inline void ltrim(std::string &s) { s.erase(s.find_first_not_of(" \n\r\t")); }
+inline void ltrim(std::string &s) {
+  size_t start = s.find_first_not_of(" \n\r\t");
+  if (start != std::string::npos) {
+    s.erase(0, start);
+  } else {
+    s.clear();
+  }
+}
 
 inline void strip_comments(std::string &s) {
   size_t comment = s.find("#");

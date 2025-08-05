@@ -9,11 +9,10 @@
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-  Config::WriteDefault();
-  // Config config;
-  // MockDownloader downloader;
-  // Cli cli(&downloader, config);
-  // return cli.Run(argc, argv);
+  Config config;
+  MockDownloader downloader;
+  Cli cli(&downloader, config);
+  return cli.Run(argc, argv);
 }
 
 // int main(int argc, char *argv[]) {
