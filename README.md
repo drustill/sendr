@@ -39,18 +39,25 @@ Build presets are in `CMakePresets.json`, and will build the program with or wit
 
 - [x] kqueue events emitted to registered listeners.
 - [x] ./sendr 'query' and see list of results
-- [ ] sendr cli
+- [x] bare sendr cli
+
+- [ ] SmtpClient with logging
+- [ ] SmtpClient with TLS/OpenSSL
+- [ ] SmtpClient AUTH LOGIN
+- [ ] SmtpClient SendMail()
+
+- [ ] Mailer wiring
+- [ ] MailerListener::OnEvent()
+
+- [ ] full sendr cli
+- [ ] polish
 
 - `sendr` cli design
   ```bash
-    Usage: sendr fetch [--engine <name>] [--max N] [--format epub|pdf] <search terms…>
+    Usage: sendr get [--max N] [--format epub|pdf] <search terms…>
 
     Options:
-      --engine <name>     which indexer to query (anna, libgen, openlib, gutenberg)
       --max N             limit to top N matches (default: 1)
       --format <fmt>      desired file format (epub, pdf; default: epub)
       --dry-run           just print URLs, don’t download or send
-      --out-dir <path>    download into this directory instead of mailing
-      --send-to-kindle    after download, email to your Kindle address
-      --config <file>     path to ~/.sendr/config (SMTP/IMAP creds, Kindle email)
   ```

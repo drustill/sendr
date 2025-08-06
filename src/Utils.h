@@ -2,6 +2,9 @@
 
 #include <cstdlib>
 #include <gumbo.h>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <openssl/evp.h>
 #include <regex>
 #include <string>
 #include <vector>
@@ -92,6 +95,33 @@ inline std::string search_for_links(GumboNode *node, std::regex filter) {
   }
 
   return "";
+}
+
+inline std::string escape_new_lines(const std::string &s) {
+  std::string out = s;
+  size_t pos = 0;
+  while ((pos = out.find("\r\n", pos)) != std::string::npos) {
+    out.replace(pos, 2, "\\r\\n");
+    pos += 4;
+  }
+  return out;
+}
+
+inline std::string base64_encode(const std::string &s) {
+  BIO *bio, *b64;
+  BUF_MEM *bufferptr;
+  b64 = BIO_new(BIO_f_base64());
+  bio = BIO_new(BIO_s_mem());
+  bio = BIO_push(b64, bio);
+
+  BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL);
+  BIO_write(bio, s.data(), s.size());
+  BIO_flush(bio);
+  BIO_get_mem_ptr(bio, &bufferptr);
+
+  std::string out(bufferptr->data, bufferptr->length);
+  BIO_free_all(bio);
+  return out;
 }
 
 } // namespace util

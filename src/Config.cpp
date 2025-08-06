@@ -14,6 +14,9 @@ const std::string Config::default_path =
 const std::string Config::default_download_dir =
     std::string(std::getenv("HOME")) + "/sendr/lib/";
 
+const std::string Config::default_smtp_host = "smtp.gmail.com";
+const int Config::default_smtp_port = 587;
+
 Config::Config(const std::string &path) {
   std::ifstream f(path);
   if (!f.is_open()) {
@@ -45,6 +48,15 @@ Config::Config(const std::string &path) {
 
     if (key == "annas_archive_key") {
       settings.api_key = val;
+    } else if (key == "smtp_host") {
+      settings.smtp_host = val;
+    } else if (key == "smtp_port") {
+      try {
+        settings.smtp_port = std::stoi(val);
+      } catch (const std::exception &e) {
+        std::cerr << "[ERR] Invalid SMTP port : " << val << " (" << e.what()
+                  << ")\n";
+      }
     } else if (key == "smtp_user") {
       settings.smtp_user = val;
     } else if (key == "smtp_pass") {
@@ -78,8 +90,8 @@ void Config::WriteDefault(const std::string &path) {
 annas_archive_key =
 
 # mail
-smtp_host =
-smtp_port =
+smtp_host = {}
+smtp_port = {}
 smtp_user =
 smtp_pass =
 kindle_email =
@@ -87,6 +99,7 @@ kindle_email =
 # library
 download_dir = {}
 )",
+                     Config::default_smtp_host, Config::default_smtp_port,
                      Config::default_download_dir);
 
   out.close();

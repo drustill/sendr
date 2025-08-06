@@ -4,16 +4,41 @@
 #include "LoggingListener.h"
 #include "MockDownloader.h"
 #include "SearchClient.h"
+#include "SmtpClient.h"
 
 #include <fstream>
 #include <iostream>
 
-int main(int argc, char *argv[]) {
+int main() {
   Config config;
-  MockDownloader downloader;
-  Cli cli(&downloader, config);
-  return cli.Run(argc, argv);
+  SmtpClient client(config);
+  SmtpError err = client.Connect();
+
+  if (err != SmtpError::Ok) {
+    std::cerr << "FAIL" << static_cast<int>(err) << "\n";
+  } else {
+    std::cout << "OK\n";
+  }
+
+  try {
+    client.StartTLS();
+    client.Authenticate();
+  } catch (std::exception &e) {
+    std::cerr << "EXCEPTION\n";
+  }
+
+  std::cout << "=============\n"
+            << client.logger.Data() << "\n\n=============\n";
+
+  return 0;
 }
+
+// int main(int argc, char *argv[]) {
+//   Config config;
+//   MockDownloader downloader;
+//   Cli cli(&downloader, config);
+//   return cli.Run(argc, argv);
+// }
 
 // int main(int argc, char *argv[]) {
 //   if (argc < 2) {

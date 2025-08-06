@@ -27,6 +27,10 @@ target_compile_options(sendr PRIVATE ${GUMBO_CFLAGS_OTHER})
 find_package(CURL REQUIRED)
 target_link_libraries(sendr PRIVATE CURL::libcurl)
 
+find_package(OpenSSL REQUIRED)
+target_include_directories(sendr PRIVATE ${OPENSSL_INCLUDE_DIR})
+target_link_libraries(sendr PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
 option(BUILD_TESTS "Build Catch2 tests" OFF)
 
 if (BUILD_TESTS)
