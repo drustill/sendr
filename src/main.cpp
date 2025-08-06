@@ -3,6 +3,8 @@
 #include "Daemon.h"
 #include "Downloader.h"
 #include "Pid.h"
+#include "Using.h"
+
 // #include "MockDownloader.h"
 
 #include <fstream>
@@ -10,38 +12,22 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  if (argc >= 2) {
-    std::string cmd = argv[1];
-    if (cmd == "daemon") {
-      SpawnDaemon();
-      return 0;
-    } else if (cmd == "reset") {
-      KillDaemon();
-      pid_t pid = fork();
-      if (pid == 0) {
-        execl("/usr/bin/env", "env", "sendr", "daemon", (char *)nullptr);
-        _exit(1);
-      }
-      std::cout << "sendr daemon reloaded.\n";
-      return 0;
-    } else if (cmd == "stop") {
-      KillDaemon();
-      return 0;
-    }
+  if (argc < 2) {
+    Cli::ShowUsage();
+    return 1;
   }
 
-  if (!IsDaemonSpawn()) {
-    pid_t pid = fork();
-    if (pid == 0) {
-      execl("/usr/bin/env", "env", "sendr", "daemon", (char *)nullptr);
-      _exit(1);
-    }
-    sleep(1);
+  std::string top_cmd = argv[1];
+
+  if (top_cmd == "daemon") {
+    return HandleDaemonCommand(argc, argv);
   }
+
+  EnsureDaemonSpawn();
 
   Config config;
   Downloader downloader(config);
-  // MockDownloader downloader;
   Cli cli(&downloader, config);
+
   return cli.Run(argc, argv);
 }

@@ -1,8 +1,17 @@
 # sendr
 
-Search for books, download them, and automatically have them emailed to an ereader directly from the command line
+Search for books, download them, and automatically have them emailed to an ereader directly from the command line.
+
+sendr is intentionally over complicated. sendr will start a daemon process and listen to `~/sendr/lib/` using kqueue.
+Books are downloaded through annas archive, and to use sendr you must have an annas archive secret key. sendr will look for
+configuration from `~/.config/sendr/sendr.conf`. On installation (once registered on homebrew) a default config is created.
 
 ---
+
+## Installing
+
+### TODO!
+`brew install sendr`
 
 ## Test Prerequisites
 
@@ -41,23 +50,31 @@ Build presets are in `CMakePresets.json`, and will build the program with or wit
 - [x] ./sendr 'query' and see list of results
 - [x] bare sendr cli
 
-- [ ] SmtpClient with logging
-- [ ] SmtpClient with TLS/OpenSSL
-- [ ] SmtpClient AUTH LOGIN
-- [ ] SmtpClient SendMail()
+- [x] SmtpClient with logging
+- [x] SmtpClient with TLS/OpenSSL
+- [x] SmtpClient AUTH LOGIN
+- [x] SmtpClient SendMail()
 
-- [ ] Mailer wiring
-- [ ] MailerListener::OnEvent()
+- [x] Mailer wiring
+- [x] MailerListener::OnEvent()
 
-- [ ] full sendr cli
-- [ ] polish
+- [x] sendr cli
 
 - `sendr` cli design
   ```bash
-    Usage: sendr get [--max N] [--format epub|pdf] <search terms…>
+Usage:
+  sendr fetch [options] <search terms…>
+  sendr daemon <start|stop|restart|status>
 
-    Options:
-      --max N             limit to top N matches (default: 1)
-      --format <fmt>      desired file format (epub, pdf; default: epub)
-      --dry-run           just print URLs, don’t download or send
+Fetch Options:
+  --max <N>           limit to top N matches (default: 1)
+  --format <fmt>      desired format: epub, pdf (default: epub)
+  --dry-run           print download URL, don’t download or send
+
+Daemon Commands:
+  start               launch the daemon process
+  stop                stop the running daemon
+  status              print daemon status (running or not)
+  restart             restart the daemon
+
   ```

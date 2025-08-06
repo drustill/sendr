@@ -13,3 +13,6 @@ using WatchMap = std::map<int, std::string>;
 
 struct Row;
 using RowVector = std::vector<Row>;
+
+enum class DaemonCommand;
+using DaemonCommandMap = std::unordered_map<std::string, DaemonCommand>;

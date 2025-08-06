@@ -10,9 +10,11 @@ std::string SearchClient::BuildUrl(const SearchParams &params) const {
       curl_easy_escape(nullptr, params.query.c_str(), params.query.size());
   oss << base_url << "?index=&page=" << params.page << "&q=" << encoded
       << "&display=table";
-  if (params.format) {
-    oss << "&ext=" << *params.format;
+
+  for (auto format : params.formats) {
+    oss << "&ext=" << format;
   }
+
   if (params.lang) {
     oss << "&lang=" << *params.lang;
   }
@@ -21,7 +23,6 @@ std::string SearchClient::BuildUrl(const SearchParams &params) const {
 
 RowVector SearchClient::Search(const SearchParams &params) const {
   auto url = BuildUrl(params);
-  std::cout << url << "\n";
   auto response = client.Get(url);
   if (response.status_code != 200) {
     throw std::runtime_error("Search failed : " +

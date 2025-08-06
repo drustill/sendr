@@ -10,7 +10,7 @@
 struct SearchParams {
   std::string query;
   std::optional<std::string> lang;
-  std::optional<std::string> format;
+  std::vector<std::string> formats;
   int page = 1;
   int max_results = 0;
 };

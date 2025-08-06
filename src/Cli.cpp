@@ -3,14 +3,37 @@
 #include "Mailer.h"
 
 #include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <thread>
+
+#define CYAN "\033[1;36m"
+#define GREY "\033[2;37m"
+#define RESET "\033[0m"
 
 Cli::Cli(DownloaderInterface *downloader, const Config &config)
     : downloader(downloader), config(config) {}
 
 Cli::~Cli() {}
+
+void Cli::ShowUsage() {
+  std::cout << R"(Usage:
+  sendr fetch [options] <search terms…>
+  sendr daemon <start|stop|restart|status>
+
+Fetch Options:
+  --max <N>           limit to top N matches (default: 1)
+  --format <fmt>      desired format: epub, pdf (default: epub)
+  --dry-run           print download URL, don’t download or send
+
+Daemon Commands:
+  start               launch the daemon process
+  stop                stop the running daemon
+  status              print daemon status (running or not)
+  restart             restart the daemon
+)";
+}
 
 int Cli::Run(int argc, char *argv[]) {
   if (argc < 2) {
@@ -19,49 +42,105 @@ int Cli::Run(int argc, char *argv[]) {
   }
 
   std::string cmd = argv[1];
-  if (cmd == "get") {
-    std::string query;
-    for (int i = 2; i < argc; ++i) {
-      if (!query.empty())
-        query += " ";
-      query += argv[i];
-    }
-
-    FetchBooks(query);
-    return 0;
+  if (cmd == "search") {
+    return HandleSearchCommand(argc - 2, argv + 2);
   }
 
   ShowUsage();
   return 1;
 }
 
-void Cli::ShowUsage() const {
-  std::cout << "Usage: sendr get <search query>...\n";
+int Cli::HandleSearchCommand(int argc, char *argv[]) {
+  SearchOptions opts;
+
+  for (int i = 0; i < argc; ++i) {
+    std::string arg = argv[i];
+
+    if (arg == "--max" && i + 1 < argc) {
+      opts.max_results = std::stoi(argv[++i]);
+    } else if (arg == "--format" && i + 1 < argc) {
+      std::string fmt = argv[++i];
+      opts.formats.clear();
+      std::stringstream ss(fmt);
+      std::string item;
+      while (std::getline(ss, item, ',')) {
+        if (SupportedFormats.contains(item)) {
+          opts.formats.push_back(item);
+        }
+      }
+    } else if (arg == "--dry-run") {
+      opts.dry_run = true;
+    } else if (arg == "--query" && i + 1 < argc) {
+      opts.query = argv[++i];
+      opts.query_given = true;
+    } else {
+      std::cerr << "Unknown flag: " << arg << "\n";
+      ShowUsage();
+      return 1;
+    }
+  }
+
+  if (!opts.query_given) {
+    std::cout << "Enter your search query: ";
+    std::getline(std::cin, opts.query);
+  }
+
+  return RunSearch(opts);
 }
 
-void Cli::FetchBooks(const std::string &query) {
+int Cli::RunSearch(const SearchOptions &opts) {
   SearchParams params;
-  params.query = query;
-  params.max_results = 5;
+  params.query = opts.query;
+  params.max_results = opts.max_results;
+  params.formats = opts.formats;
 
   try {
     RowVector results = search.Search(params);
-    if (results.empty()) {
-      std::cout << "Nothing matched your query!\n";
-      return;
+    if (opts.dry_run) {
+      PrintBookResults(results);
+      return 0;
     }
+
     StartInteractiveSession(results);
+    return 0;
+
   } catch (const std::exception &e) {
-    std::cerr << "Error : " << e.what() << "\n";
+    std::cerr << "Error: " << e.what() << "\n";
+    return 1;
   }
 }
 
-void Cli::StartInteractiveSession(RowVector &results) {
-  std::cout << "Select a book to download & send\n";
-  for (size_t i = 0; i < results.size(); ++i) {
-    std::cout << i + 1 << ". " << results[i].title << " by "
-              << results[i].author << "\n";
+static std::string Truncate(const std::string &s, size_t width) {
+  if (s.size() <= width)
+    return s;
+  return s.substr(0, width - 3) + "...";
+}
+
+void Cli::PrintBookResults(const RowVector &results) {
+  std::cout << GREY << "\nFound " << results.size() << " result"
+            << (results.size() > 1 ? "s" : "") << RESET << ":\n\n";
+
+  std::cout << CYAN << std::setw(4) << "No." << std::setw(42) << "Title"
+            << std::setw(26) << "Author" << std::setw(20) << "Publisher"
+            << std::setw(6) << "Year" << std::setw(6) << "Lang" << std::setw(8)
+            << "Format" << std::setw(8) << "Size"
+            << "\n";
+
+  std::cout << GREY << std::string(120, '-') << RESET << "\n";
+
+  int i = 1;
+  for (const auto &row : results) {
+    std::cout << std::setw(4) << i++ << std::setw(42) << Truncate(row.title, 40)
+              << std::setw(26) << Truncate(row.author, 24) << std::setw(20)
+              << Truncate(row.publisher, 12) << std::setw(6)
+              << Truncate(row.year, 8) << std::setw(6) << row.lang
+              << std::setw(8) << row.format << std::setw(8) << row.size << "\n";
   }
+  std::cout << "\n";
+}
+
+void Cli::StartInteractiveSession(RowVector &results) {
+  PrintBookResults(results);
 
   int pick = 0;
   while (true) {
@@ -79,9 +158,22 @@ void Cli::StartInteractiveSession(RowVector &results) {
 }
 
 void Cli::DownloadAndSend(const Row &row) {
-  std::cout << "Downloading " << row.title << "...\n";
+  std::string path = config.Get().download_dir + row.title;
 
-  std::string dir = config.Get().download_dir;
-  std::string filename = dir + row.title;
-  downloader->Download(row.md5, filename);
+  std::cout << "\nPreparing to download and send:\n"
+            << "  Title     : " << row.title << "\n"
+            << "  Author    : " << row.author << "\n"
+            << "  Publisher : " << row.publisher << "\n"
+            << "  Year      : " << row.year << "\n"
+            << "  Format    : " << row.format << "\n"
+            << "  Size      : " << row.size << "\n\n"
+            << "Saving to: " << path << "\n"
+            << "File will be sent after download completes.\n\n";
+
+  try {
+    downloader->Download(row.md5, path);
+    std::cout << "Sent!\n\n";
+  } catch (const std::exception &e) {
+    std::cerr << "[ERROR] Failed to download file: " << e.what() << "\n";
+  }
 }
