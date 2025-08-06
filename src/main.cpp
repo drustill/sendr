@@ -1,90 +1,47 @@
 #include "Cli.h"
 #include "Config.h"
-#include "KQueueListener.h"
-#include "LoggingListener.h"
-#include "MockDownloader.h"
-#include "SearchClient.h"
-#include "SmtpClient.h"
+#include "Daemon.h"
+#include "Downloader.h"
+#include "Pid.h"
+// #include "MockDownloader.h"
 
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 
-int main() {
+int main(int argc, char *argv[]) {
+  if (argc >= 2) {
+    std::string cmd = argv[1];
+    if (cmd == "daemon") {
+      SpawnDaemon();
+      return 0;
+    } else if (cmd == "reset") {
+      KillDaemon();
+      pid_t pid = fork();
+      if (pid == 0) {
+        execl("/usr/bin/env", "env", "sendr", "daemon", (char *)nullptr);
+        _exit(1);
+      }
+      std::cout << "sendr daemon reloaded.\n";
+      return 0;
+    } else if (cmd == "stop") {
+      KillDaemon();
+      return 0;
+    }
+  }
+
+  if (!IsDaemonSpawn()) {
+    pid_t pid = fork();
+    if (pid == 0) {
+      execl("/usr/bin/env", "env", "sendr", "daemon", (char *)nullptr);
+      _exit(1);
+    }
+    sleep(1);
+  }
+
   Config config;
-  SmtpClient client(config);
-  SmtpError err = client.Connect();
-
-  if (err != SmtpError::Ok) {
-    std::cerr << "FAIL" << static_cast<int>(err) << "\n";
-  } else {
-    std::cout << "OK\n";
-  }
-
-  try {
-    client.StartTLS();
-    client.Authenticate();
-  } catch (std::exception &e) {
-    std::cerr << "EXCEPTION\n";
-  }
-
-  std::cout << "=============\n"
-            << client.logger.Data() << "\n\n=============\n";
-
-  return 0;
+  Downloader downloader(config);
+  // MockDownloader downloader;
+  Cli cli(&downloader, config);
+  return cli.Run(argc, argv);
 }
-
-// int main(int argc, char *argv[]) {
-//   Config config;
-//   MockDownloader downloader;
-//   Cli cli(&downloader, config);
-//   return cli.Run(argc, argv);
-// }
-
-// int main(int argc, char *argv[]) {
-//   if (argc < 2) {
-//     std::cout << "Usage: main <query>.\n";
-//     exit(EXIT_FAILURE);
-//   }
-
-//   SearchClient client;
-//   SearchParams params;
-
-//   params.query = argv[1];
-//   params.max_results = 5;
-//   params.lang = "en";
-
-//   RowVector rows = client.Search(params);
-
-//   for (const auto &row : rows) {
-//     std::cout << "MD5: " << row.md5 << "\n";
-//     std::cout << "Title: " << row.title << "\n";
-//     std::cout << "Author: " << row.author << "\n";
-//     std::cout << "Publisher: " << row.publisher << "\n";
-//     std::cout << "Year: " << row.year << "\n";
-//     std::cout << "Lang: " << row.lang << "\n";
-//     std::cout << "Format: " << row.format << "\n";
-//     std::cout << "Size: " << row.size << "\n";
-//     std::cout << "-------------------------\n";
-//   }
-
-//   return 0;
-// };
-
-// int main()
-// {
-//   KQueueListener kq;
-//   LoggingListener ll;
-
-//   kq.AddListener(&ll);
-//   std::string dir = std::string(std::getenv("HOME")) + "/KQueueListenerTest";
-//   kq.WatchDir(dir);
-
-//   kq.Start();
-
-//   std::cout << "Watching " << dir << "\n- press <Ctrl+C> to quit.\n";
-//   std::cin.get();
-
-//   kq.Stop();
-//   std::cout << "Stopped.\n";
-//   return 0;
-// };

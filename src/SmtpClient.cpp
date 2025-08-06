@@ -3,13 +3,14 @@
 
 #include <arpa/inet.h>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <netdb.h>
 #include <sstream>
 #include <sys/socket.h>
 #include <unistd.h>
 
-SmtpClient::SmtpClient(Config &config)
+SmtpClient::SmtpClient(const Config &config)
     : config(config), socketfd(-1), ssl_ctx(nullptr), ssl(nullptr) {}
 
 SmtpClient::~SmtpClient() { Disconnect(); }
@@ -93,7 +94,8 @@ void SmtpClient::SendLine(const std::string &data) {
   } else if (send(socketfd, line.c_str(), line.size(), 0) < 0) {
     throw std::runtime_error(strerror(errno));
   }
-  logger.Log(CommunicationLogger::LogPrefix, "C: " + line);
+  logger.Log(CommunicationLogger::LogPrefix,
+             "Sent " + std::to_string(line.size()));
 }
 
 void SmtpClient::StartTLS() {
@@ -173,4 +175,68 @@ void SmtpClient::Authenticate() {
   if (!pass_response.starts_with("235")) {
     throw std::runtime_error("LOGIN FAIL");
   }
+}
+
+void SmtpClient::SendMail(const EmailMessage &msg,
+                          const std::string &attachment) {
+  SendLine("MAIL FROM:<" + msg.from + ">");
+  logger.Log(CommunicationLogger::LogPrefix, ReadResponseTLS());
+
+  SendLine("RCPT TO:<" + msg.to + ">");
+  logger.Log(CommunicationLogger::LogPrefix, ReadResponseTLS());
+
+  SendLine("DATA");
+  std::string response = ReadResponseTLS();
+  logger.Log(CommunicationLogger::LogPrefix, response);
+  if (!response.starts_with("354")) {
+    throw std::runtime_error("DATA");
+  }
+
+  std::string email = BuildMIMEMessage(msg, attachment);
+
+  SendLine(email);
+  logger.Log(CommunicationLogger::LogPrefix, ReadResponseTLS());
+}
+
+std::string SmtpClient::BuildMIMEMessage(const EmailMessage &msg,
+                                         const std::string &attachment) {
+  std::ifstream file(attachment, std::ios::binary);
+  if (!file) {
+    throw std::runtime_error(attachment);
+  }
+
+  std::ostringstream email;
+  std::string boundary = "SENDR_BOUNDARY";
+  std::string filename = std::filesystem::path(attachment).filename().string();
+
+  std::ostringstream file_content_readable;
+  file_content_readable << file.rdbuf();
+  std::string encoded = util::base64_encode(file_content_readable.str());
+
+  email << "From: " << msg.from << "\r\n";
+  email << "To: " << msg.to << "\r\n";
+  email << "Subject: " << msg.subject << "\r\n";
+  email << "MIME-Version: 1.0\r\n";
+  email << "Content-Type: multipart/mixed; boundary=" << boundary << "\r\n";
+  email << "\r\n";
+  email << "--" << boundary << "\r\n";
+  email << "Content-Type: text/plain; charset=UTF-8\r\n";
+  email << "Content-Transfer-Encoding: 7bit\r\n";
+  email << "\r\n";
+  email << msg.body << "\r\n";
+  email << "--" << boundary << "\r\n";
+  email << "Content-Type: application/octet-stream; name=\"" << filename
+        << "\"\r\n";
+  email << "Content-Transfer-Encoding: base64\r\n";
+  email << "Content-Disposition: attachment; filename=\"" << filename
+        << "\"\r\n";
+  email << "\r\n";
+
+  for (size_t i = 0; i < encoded.length(); i += Base64LineLimit) {
+    email << encoded.substr(i, Base64LineLimit) << "\r\n";
+  }
+  email << "--" << boundary << "--\r\n";
+  email << "\r\n.\r\n";
+
+  return email.str();
 }

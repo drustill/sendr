@@ -10,6 +10,7 @@
 
 #include <atomic>
 #include <thread>
+#include <unordered_set>
 
 #include "Using.h"
 
@@ -22,8 +23,11 @@ private:
   WatchMap watched;
   Listeners listeners;
 
+  std::unordered_map<std::string, std::unordered_set<std::string>> path_files;
+
   /// Block in kevent() and emit to registered listeners.
   void EventLoop();
+  std::unordered_set<std::string> ls(const std::string &path);
 
 public:
   /// Create kqueue descriptor.

@@ -1,11 +1,14 @@
 #pragma once
 
 #include <cstdlib>
+#include <fstream>
 #include <gumbo.h>
+#include <iomanip>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <regex>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -122,6 +125,41 @@ inline std::string base64_encode(const std::string &s) {
   std::string out(bufferptr->data, bufferptr->length);
   BIO_free_all(bio);
   return out;
+}
+
+inline std::string md5(const std::string &path) {
+  std::ifstream file(path, std::ios::binary);
+  if (!file) {
+    return "";
+  }
+
+  EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+  const EVP_MD *md = EVP_md5();
+  if (!EVP_DigestInit_ex(ctx, md, nullptr)) {
+    return "";
+  }
+
+  char buffer[8192];
+  while (file.good()) {
+    file.read(buffer, sizeof(buffer));
+    if (!EVP_DigestUpdate(ctx, buffer, file.gcount())) {
+      return "";
+    }
+  }
+
+  unsigned char result[EVP_MAX_MD_SIZE];
+  unsigned int len = 0;
+  if (!EVP_DigestFinal_ex(ctx, result, &len)) {
+    return "";
+  }
+
+  EVP_MD_CTX_free(ctx);
+
+  std::ostringstream hex;
+  for (unsigned char i = 0; i < len; ++i) {
+    hex << std::hex << std::setw(2) << std::setfill('0') << (int)result[i];
+  }
+  return hex.str();
 }
 
 } // namespace util

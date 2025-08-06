@@ -24,9 +24,10 @@ enum class SmtpError {
 
 class SmtpClient {
 public:
-  SmtpClient(Config &config);
+  SmtpClient(const Config &config);
   ~SmtpClient();
 
+  static constexpr size_t Base64LineLimit = 76;
   static constexpr size_t ResponseBufferSize = 2048;
 
   CommunicationLogger logger;
@@ -34,7 +35,7 @@ public:
   SmtpError Connect();
   void StartTLS();
   void Authenticate();
-  void SendMail(const EmailMessage &msg);
+  void SendMail(const EmailMessage &msg, const std::string &attachment);
   void Disconnect();
 
 private:
@@ -42,10 +43,12 @@ private:
   SSL_CTX *ssl_ctx;
   SSL *ssl;
 
-  Config config;
+  const Config config;
 
   void SendLine(const std::string &data);
   void UpgradeToTLS();
   std::string ReadResponse();
   std::string ReadResponseTLS();
+  std::string BuildMIMEMessage(const EmailMessage &msg,
+                               const std::string &attachment);
 };

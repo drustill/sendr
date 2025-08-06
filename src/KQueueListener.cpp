@@ -1,5 +1,6 @@
 #include "KQueueListener.h"
 
+#include <dirent.h>
 #include <fcntl.h>
 #include <iostream>
 #include <sys/event.h>
@@ -52,11 +53,18 @@ void KQueueListener::EventLoop() {
         continue;
 
       const std::string &path = it->second;
-      FileAction action = actionFromFFlags(event.fflags);
 
-      for (auto *l : listeners) {
-        l->OnEvent(FileEvent{path, action});
+      auto &old_files = path_files[path];
+      auto new_files = ls(path);
+      for (const auto &file : new_files) {
+        if (!old_files.contains(file)) {
+          for (auto *l : listeners) {
+            l->OnEvent(FileEvent{file, FileAction::Created});
+          }
+        }
       }
+
+      old_files = std::move(new_files);
     }
   }
 }
@@ -89,6 +97,7 @@ int KQueueListener::WatchDir(const std::string &path) {
     return dirfd;
   }
   watched[dirfd] = path;
+  path_files[path] = ls(path);
   KEvent evSet;
   EV_SET(&evSet, dirfd, EVFILT_VNODE, EV_ADD | EV_CLEAR,
          NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME |
@@ -100,4 +109,21 @@ int KQueueListener::WatchDir(const std::string &path) {
   }
 
   return 0;
+}
+
+std::unordered_set<std::string> KQueueListener::ls(const std::string &path) {
+  std::unordered_set<std::string> snapshot;
+  DIR *dir = opendir(path.c_str());
+  if (!dir) {
+    return snapshot;
+  }
+
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != nullptr) {
+    if (entry->d_type == DT_REG) {
+      snapshot.insert(path + entry->d_name);
+    }
+  }
+  closedir(dir);
+  return snapshot;
 }

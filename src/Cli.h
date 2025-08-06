@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DownloaderInterface.h"
-#include "KQueueListener.h"
 #include "SearchClient.h"
 
 #include <memory>
@@ -10,6 +9,7 @@
 class Cli {
 public:
   Cli(DownloaderInterface *downloader, const Config &config);
+  ~Cli();
   int Run(int argc, char *argv[]);
 
 private:
@@ -19,7 +19,6 @@ private:
   void StartInteractiveSession(RowVector &results);
   void DownloadAndSend(const Row &row);
 
-  KQueueListener kq;
   SearchClient search;
   DownloaderInterface *downloader;
   const Config &config;

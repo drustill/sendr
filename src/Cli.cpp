@@ -1,5 +1,6 @@
 #include "Cli.h"
 #include "LoggingListener.h"
+#include "Mailer.h"
 
 #include <chrono>
 #include <iostream>
@@ -8,6 +9,8 @@
 
 Cli::Cli(DownloaderInterface *downloader, const Config &config)
     : downloader(downloader), config(config) {}
+
+Cli::~Cli() {}
 
 int Cli::Run(int argc, char *argv[]) {
   if (argc < 2) {
@@ -78,13 +81,7 @@ void Cli::StartInteractiveSession(RowVector &results) {
 void Cli::DownloadAndSend(const Row &row) {
   std::cout << "Downloading " << row.title << "...\n";
 
-  kq.AddListener(new LoggingListener());
   std::string dir = config.Get().download_dir;
-
-  kq.WatchDir(dir);
-  kq.Start();
-
-  downloader->Download(row.md5, dir + "temp.txt");
-
-  kq.Stop();
+  std::string filename = dir + row.title;
+  downloader->Download(row.md5, filename);
 }
