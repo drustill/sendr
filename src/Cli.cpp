@@ -158,7 +158,7 @@ void Cli::StartInteractiveSession(RowVector &results) {
 }
 
 void Cli::DownloadAndSend(const Row &row) {
-  std::string path = config.Get().download_dir + row.title;
+  std::string path = config.Get().download_dir + row.title + "." + row.format;
 
   std::cout << "\nPreparing to download and send:\n"
             << "  Title     : " << row.title << "\n"
