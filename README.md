@@ -2,7 +2,7 @@
 
 Search for books, download them, and automatically have them emailed to an ereader directly from the command line.
 
-sendr is intentionally over complicated. sendr will start a daemon process and listen to `~/sendr/lib/` using kqueue.
+sendr is intentionally over complicated. the goal was to mess around with kqueue. sendr will start a daemon process and listen to `~/sendr/lib/` using kqueue.
 Books are downloaded through annas archive, and to use sendr you must have an annas archive secret key. sendr will look for
 configuration from `~/.config/sendr/sendr.conf`.
 
