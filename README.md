@@ -4,14 +4,38 @@ Search for books, download them, and automatically have them emailed to an eread
 
 sendr is intentionally over complicated. sendr will start a daemon process and listen to `~/sendr/lib/` using kqueue.
 Books are downloaded through annas archive, and to use sendr you must have an annas archive secret key. sendr will look for
-configuration from `~/.config/sendr/sendr.conf`. On installation (once registered on homebrew) a default config is created.
+configuration from `~/.config/sendr/sendr.conf`.
 
 ---
 
+```bash
+Usage:
+  sendr fetch [options] <search terms…>
+  sendr daemon <start|stop|restart|status>
+
+Fetch Options:
+  --max <N>           limit to top N matches (default: 1)
+  --format <fmt>      desired format: epub, pdf (default: epub)
+  --dry-run           print download URL, don’t download or send
+
+Daemon Commands:
+  start               launch the daemon process
+  stop                stop the running daemon
+  status              print daemon status (running or not)
+  restart             restart the daemon
+```
+
 ## Installing
 
-### TODO!
-`brew install sendr`
+```bash
+brew tap drustill/sendr
+brew install sendr
+```
+
+## TODOs:
+
+- `sendr login` top level command; make it easier to add kindle email and annas archive key to `.conf`
+- shell completions
 
 ## Test Prerequisites
 
@@ -58,23 +82,4 @@ Build presets are in `CMakePresets.json`, and will build the program with or wit
 - [x] Mailer wiring
 - [x] MailerListener::OnEvent()
 
-- [x] sendr cli
-
-- `sendr` cli design
-  ```bash
-Usage:
-  sendr fetch [options] <search terms…>
-  sendr daemon <start|stop|restart|status>
-
-Fetch Options:
-  --max <N>           limit to top N matches (default: 1)
-  --format <fmt>      desired format: epub, pdf (default: epub)
-  --dry-run           print download URL, don’t download or send
-
-Daemon Commands:
-  start               launch the daemon process
-  stop                stop the running daemon
-  status              print daemon status (running or not)
-  restart             restart the daemon
-
-  ```
+- [x] cli

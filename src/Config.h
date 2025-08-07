@@ -18,8 +18,6 @@ class Config {
 public:
   static const std::string default_path;
   static const std::string default_download_dir;
-  static const std::string default_smtp_host;
-  static const int default_smtp_port;
 
   explicit Config(const std::string &path = default_path);
 

@@ -14,13 +14,11 @@ const std::string Config::default_path =
 const std::string Config::default_download_dir =
     std::string(std::getenv("HOME")) + "/sendr/lib/";
 
-const std::string Config::default_smtp_host = "smtp.gmail.com";
-const int Config::default_smtp_port = 587;
-
 Config::Config(const std::string &path) {
   std::ifstream f(path);
   if (!f.is_open()) {
     std::cerr << "[WARN] sendr.conf not found! " << path << "\n";
+    Config::WriteDefault(path);
     return;
   }
 
@@ -70,7 +68,7 @@ Config::Config(const std::string &path) {
 }
 
 void Config::WriteDefault(const std::string &path) {
-  std::cout << path << "\n";
+  std::cout << "[INFO] Writing default config to " << path << "\n";
   std::filesystem::create_directories(
       std::filesystem::path(path).parent_path());
 
@@ -99,8 +97,7 @@ kindle_email =
 # library
 download_dir = {}
 )",
-                     Config::default_smtp_host, Config::default_smtp_port,
-                     Config::default_download_dir);
+                     "smtp.gmail.com", 587, Config::default_download_dir);
 
   out.close();
   std::cout << "[INFO] Wrote default config to: " << path << "\n";
