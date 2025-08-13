@@ -19,13 +19,14 @@ Cli::~Cli() {}
 
 void Cli::ShowUsage() {
   std::cout << R"(Usage:
-  sendr fetch [options] <search terms…>
+  sendr search [options] <search terms…>
   sendr daemon <start|stop|restart|status>
 
 Fetch Options:
   --max <N>           limit to top N matches (default: 1)
   --format <fmt>      desired format: epub, pdf (default: epub)
   --dry-run           print download URL, don’t download or send
+  --query <query>     search query in quotes
 
 Daemon Commands:
   start               launch the daemon process
