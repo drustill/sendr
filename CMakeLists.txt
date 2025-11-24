@@ -27,9 +27,15 @@ target_compile_options(sendr PRIVATE ${GUMBO_CFLAGS_OTHER})
 find_package(CURL REQUIRED)
 target_link_libraries(sendr PRIVATE CURL::libcurl)
 
+set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl@3")
+set(OPENSSL_INCLUDE_DIR "/opt/homebrew/opt/openssl@3/include")
+set(OPENSSL_LIBRARIES "/opt/homebrew/opt/openssl@3/lib")
 find_package(OpenSSL REQUIRED)
-target_include_directories(sendr PRIVATE ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(sendr PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
+if(OPENSSL_FOUND)
+  target_include_directories(sendr PRIVATE ${OPENSSL_INCLUDE_DIR})
+  target_link_libraries(sendr PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+endif()
 
 option(BUILD_TESTS "Build Catch2 tests" OFF)
 
