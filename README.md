@@ -10,13 +10,14 @@ configuration from `~/.config/sendr/sendr.conf`.
 
 ```bash
 Usage:
-  sendr fetch [options] <search terms…>
+  sendr search [options] <search terms…>
   sendr daemon <start|stop|restart|status>
 
 Fetch Options:
   --max <N>           limit to top N matches (default: 1)
   --format <fmt>      desired format: epub, pdf (default: epub)
   --dry-run           print download URL, don’t download or send
+  --query <query>     search query in quotes
 
 Daemon Commands:
   start               launch the daemon process
@@ -26,6 +27,8 @@ Daemon Commands:
 ```
 
 ## Installing
+
+Note: This doesn't work - just clone and build
 
 ```bash
 brew tap drustill/sendr
