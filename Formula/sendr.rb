@@ -7,5 +7,6 @@ class Sendr < Formula
 
   def install
     bin.install "sendr"
+    zsh_completion.install "completions/sendr.zsh" => "_sendr"
   end
 end

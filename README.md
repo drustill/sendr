@@ -35,16 +35,26 @@ brew tap drustill/sendr
 brew install sendr
 ```
 
+## Shell Completions
+
+Shell completions are available
+
+```bash
+./completions/install.sh
+```
+
+Completions auto install if installed through homebrew
+
 ## TODOs:
 
 - `sendr login` top level command; make it easier to add kindle email and annas archive key to `.conf`
-- shell completions
 
 ## Test Prerequisites
 
 Install Catch2 through system package manager:
 
 - **macOS**
+
   ```bash
   brew install catch2
   ```
