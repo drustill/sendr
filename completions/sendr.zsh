@@ -12,7 +12,8 @@ _sendr() {
             '--max[Limit to top N matches]:number:' \
             '--format[Desired format]:format:(epub pdf mobi azw3)' \
             '--dry-run[Print download URL, don'\''t download or send]' \
-            '--query[Search query in quotes]:query:'
+            '--query[Search query in quotes]:query:' \
+            '*:query text:'
     elif [[ $words[2] == daemon ]]; then
         if (( CURRENT == 3 )); then
             local -a daemon_commands
