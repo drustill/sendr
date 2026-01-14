@@ -22,15 +22,18 @@ struct SearchParams {
 /// a RowVector
 class SearchClient {
 private:
-  std::string BuildUrl(const SearchParams &params) const;
+  std::string BuildUrl(const std::string &base,
+                       const SearchParams &params) const;
 
   RowReader reader;
   HttpClient client;
-  std::string base_url;
+  std::vector<std::string> base_urls;
 
 public:
-  explicit SearchClient(std::string base_url = "http://annas-archive.li/search")
-      : base_url(std::move(base_url)) {}
+  explicit SearchClient(
+      std::vector<std::string> base_urls = {"http://annas-archive.li/search"
+                                            "http://annas-archive.org/search"})
+      : base_urls(std::move(base_urls)) {}
 
   RowVector Search(const SearchParams &params) const;
 };

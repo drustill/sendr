@@ -2,35 +2,42 @@
 
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 Downloader::Downloader(const Config &config) : config(config) {}
 
 std::string Downloader::GetDownloadUrl(const std::string &md5) const {
-  std::string url =
-      "https://annas-archive.li/dyn/api/fast_download.json?md5=" + md5 +
-      "&key=" + config.Get().api_key;
-
-  HttpResponse response = client.Get(url);
-
-  auto key = std::string("\"download_url\":");
-  auto start = response.body.find(key);
-  if (start == std::string::npos) {
-    throw std::runtime_error("Missing download_url in response");
+  std::vector<std::string> domains = {"annas-archive.li", "annas-archive.org"};
+  for (const auto &domain : domains) {
+    std::string url = "https://" + domain +
+                      "/dyn/api/fast_download.json?md5=" + md5 +
+                      "&key=" + config.Get().api_key;
+    try {
+      HttpResponse response = client.Get(url);
+      if (response.status_code == 200) {
+        auto key = std::string("\"download_url\":");
+        auto start = response.body.find(key);
+        if (start != std::string::npos) {
+          continue;
+        }
+        start = response.body.find('"', start + key.length());
+        if (start == std::string::npos) {
+          continue;
+        }
+        start++;
+        auto end = response.body.find('"', start);
+        if (end == std::string::npos) {
+          continue;
+        }
+        return response.body.substr(start, end - start);
+      }
+    } catch (...) {
+      continue;
+    }
   }
-
-  start = response.body.find('"', start + key.length());
-  if (start == std::string::npos) {
-    throw std::runtime_error("Malformed download_url key");
-  }
-  start++;
-
-  auto end = response.body.find('"', start);
-  if (end == std::string::npos) {
-    throw std::runtime_error("Unterminated download_url value");
-  }
-
-  return response.body.substr(start, end - start);
+  throw std::runtime_error(
+      std::format("Failed to download from {} domains", domains.size()));
 }
 
 void Downloader::Download(const std::string &md5,
