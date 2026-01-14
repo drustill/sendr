@@ -2,11 +2,8 @@
 #include "Utils.h"
 
 #include <cstdlib>
-#include <filesystem>
-#include <format>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 const std::string Config::default_path =
     std::string(std::getenv("HOME")) + "/.config/sendr/sendr.conf";

@@ -8,7 +8,7 @@ Downloader::Downloader(const Config &config) : config(config) {}
 
 std::string Downloader::GetDownloadUrl(const std::string &md5) const {
   std::string url =
-      "https://annas-archive.org/dyn/api/fast_download.json?md5=" + md5 +
+      "https://annas-archive.li/dyn/api/fast_download.json?md5=" + md5 +
       "&key=" + config.Get().api_key;
 
   HttpResponse response = client.Get(url);

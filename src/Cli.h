@@ -1,10 +1,9 @@
 #pragma once
 
+#include "Config.h"
 #include "DownloaderInterface.h"
 #include "SearchClient.h"
 
-#include <memory>
-#include <optional>
 #include <string>
 #include <unordered_set>
 

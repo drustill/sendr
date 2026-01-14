@@ -1,8 +1,6 @@
 #pragma once
 
-#include <optional>
 #include <string>
-#include <unordered_map>
 
 struct Settings {
   std::string api_key;

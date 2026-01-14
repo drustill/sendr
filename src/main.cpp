@@ -1,14 +1,9 @@
 #include "Cli.h"
-#include "Config.h"
 #include "Daemon.h"
 #include "Downloader.h"
-#include "Pid.h"
-#include "Using.h"
 
 // #include "MockDownloader.h"
 
-#include <fstream>
-#include <iostream>
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {

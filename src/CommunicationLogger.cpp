@@ -2,7 +2,6 @@
 #include "Utils.h"
 
 #include <cstring>
-#include <iostream>
 #include <sstream>
 
 CommunicationLogger::CommunicationLogger() : log(nullptr), size(0) {}

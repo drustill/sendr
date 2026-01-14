@@ -3,7 +3,6 @@
 #include "Config.h"
 #include "EventListener.h"
 #include "Mailer.h"
-#include "Utils.h"
 
 #include <filesystem>
 #include <iostream>

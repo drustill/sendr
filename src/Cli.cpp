@@ -1,12 +1,9 @@
 #include "Cli.h"
-#include "LoggingListener.h"
-#include "Mailer.h"
 
-#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <limits>
-#include <thread>
+#include <sstream>
 
 #define CYAN "\033[1;36m"
 #define GREY "\033[2;37m"
@@ -171,6 +168,7 @@ void Cli::DownloadAndSend(const Row &row) {
             << "Saving to: " << path << "\n"
             << "File will be sent after download completes.\n\n";
 
+  // TODO: Multiple domain names for annas archive
   try {
     downloader->Download(row.md5, path);
     std::cout << "Sent!\n\n";

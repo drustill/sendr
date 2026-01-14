@@ -5,7 +5,6 @@
 #include <gumbo.h>
 #include <optional>
 #include <string>
-#include <vector>
 
 /// Represents a single <tr> element in the Anna's Archive search results table.
 ///
@@ -56,7 +55,7 @@ public:
                   std::optional<int> max_results = std::nullopt) const;
 };
 
-/// RAII wrapper for Gumbo parser
+/// Gumbo parser wrapper
 ///
 /// Runs gumbo_parse on construction and gumbo_destroy_output on
 /// destruction. Root() exposes the root of the html tree

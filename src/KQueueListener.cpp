@@ -2,7 +2,6 @@
 
 #include <dirent.h>
 #include <fcntl.h>
-#include <iostream>
 #include <sys/event.h>
 #include <unistd.h>
 
