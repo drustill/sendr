@@ -56,8 +56,12 @@ void SpawnDaemon() {
 }
 
 void DaemonStatus() {
-  std::cout << "Not Implemented!\n";
-  return;
+  std::optional<pid_t> pid = ReadPidFile();
+  if (pid.has_value()) {
+    printf("Daemon running with PID %d\n", pid.value());
+    return;
+  }
+  printf("Daemon not running");
 }
 
 int HandleDaemonCommand(int argc, char *argv[]) {
